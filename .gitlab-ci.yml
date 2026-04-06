@@ -1,0 +1,114 @@
+variables:
+  APP_NAME: core-dashboard-frontend
+  BASE_REPO: ${ECR_HIT_REPO}/vnz
+  IMAGE: ${BASE_REPO}/${APP_NAME}
+  ENVIRONMENT: production
+  API_URL: ${PROD_API_URL}
+  VUEX_KEY: ${PROD_VUEX_KEY}
+  # OLD_IMAGE: $ECR_REPO/ota/dashboard-frontend
+
+# default:
+#   cache: &global_cache
+#     - key: $CI_COMMIT_REF_SLUG
+#       paths: 
+#         - node_modules/
+#     - key: $CI_COMMIT_TAG
+#       paths:
+#         - node_modules/
+
+stages:
+  - build
+  - staging
+  - production
+
+workflow:
+  rules:
+  - if: '$CI_COMMIT_TAG'
+    variables:
+      IMAGE_TAG: ${CI_COMMIT_TAG}
+
+
+# .build_dependencies: &build_dependencies |
+#   set -x
+#   echo "API_URL=$API_URL" >> .env
+#   echo "VUEX_KEY=$VUEX_KEY" >> .env
+#   aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_HIT_REPO}
+#   docker pull ${IMAGE}:builder || true
+#   docker build --target=builder --cache-from ${IMAGE}:builder -t ${IMAGE}:builder  --file=Dockerfile .
+#   docker push ${IMAGE}:builder
+
+.build: &build |
+  set -x
+  echo "API_URL=$API_URL" >> .env
+  echo "VUEX_KEY=$VUEX_KEY" >> .env
+  aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_HIT_REPO}
+  docker build -t ${IMAGE}:${IMAGE_TAG} --file=Dockerfile .
+  docker push ${IMAGE}:${IMAGE_TAG}
+
+.deploy: &deploy |
+  git clone https://gitlab-runner:${GITLAB_RUNNER_TOKEN}@git.247technical.com/infrastructures/k8s-helm-charts/ota-charts.git
+  cd ota-charts/projects/${PROJECT}/${ENVIRONMENT}
+  git config user.email "gitlab-runner@247techncal.com"
+  git config user.name "gitlab-runner"
+
+  set -x 
+  echo "Update images for ${APP_NAME}..."
+  yq e ".dashboard-frontend.image.tag = \"$IMAGE_TAG\"" -i core/values.yaml
+  
+  git add .
+  git commit -m "Gitlab-CI update ${APP_NAME} apps image tag to ${IMAGE_TAG}" || true
+  git push || true
+
+###################### BUILD ################
+##
+
+# build_dependencies:
+#   stage: build
+#   cache:
+#     - key: $CI_COMMIT_REF_SLUG
+#       paths: 
+#         - node_modules/
+#     - key: $CI_COMMIT_TAG
+#       paths:
+#         - node_modules/
+#   script:
+#     - *build_dependencies
+#   rules:
+#     - if: '$CI_COMMIT_REF_SLUG =~ "master(.*)" || $CI_COMMIT_TAG' 
+#   tags: 
+#     - goquo-shell
+
+##
+build_for_releases:
+  stage: build
+  script:
+    - *build
+  rules:
+    - if: '$CI_COMMIT_TAG' 
+  # needs:
+  #   - job: build_dependencies
+  tags:
+    - goquo-shell
+
+
+######################## DEPLOY ####################
+
+##
+production:
+  stage: production
+  image: ${ECR_HIT_REPO}/helm:v3.13.0
+  variables:
+    NAMESPACE: meetsvn-core
+    PROJECT: core-dashboard-frontend
+    CONTAINER_NAME: core-dashboard-frontend
+  script:
+    - *deploy
+  needs:
+    - job: build_for_releases
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: on_success
+  tags:
+    - hit
+    - ota
+    - prod
