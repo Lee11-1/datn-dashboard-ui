@@ -10,7 +10,7 @@
           <q-avatar text-color="white" icon="person" size="lg" />
         </q-item-section>
         <q-item-section>
-          <q-item-label class="text-capitalize" style="font-size: 15px;">{{ first_name }} {{ last_name }}</q-item-label>
+          <q-item-label class="text-capitalize" style="font-size: 15px;">{{ full_name }}</q-item-label>
           <q-item-label caption style="color: #ffffff">{{ email }}</q-item-label>
         </q-item-section>
       </q-item>
@@ -45,14 +45,12 @@ export default {
     }
     const local_storage_key = process.env.VUEX_KEY
     const data = JSON.parse(localStorage.getItem(local_storage_key))
-    const first_name = data.Auth.account.first_name
-    const last_name = data.Auth.account.last_name
-    const email = data.Auth.account.email
+    const full_name = data.Auth.user.fullName
+    const email = data.Auth.user.email
     
     return {
       logout,
-      first_name,
-      last_name,
+      full_name,
       email
     }
   }

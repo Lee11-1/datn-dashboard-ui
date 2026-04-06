@@ -92,7 +92,8 @@ export default {
 
       const response = await api.authenticate(form.values)
       if (response.status === 200) {
-        store.commit('Auth/signed_in', response.data)
+        store.commit('Auth/signed_in', response.data.data)
+
         await router.push(route.query.callback || '/')
       } else {
         process.error_code = response.data.error

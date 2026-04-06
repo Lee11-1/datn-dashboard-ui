@@ -12,7 +12,6 @@
     </template>
     <template v-else>
       <layout-header @menu_btn_clicked="$refs.left_drawer.toggle()"/>
-      <layout-left-drawer ref="left_drawer"/>
       <q-page-container>
         <q-page class="q-pa-sm">
           <div class="row q-col-gutter-sm">
@@ -30,7 +29,6 @@
 </template>
 <script>
 import LayoutHeader from 'src/components/layout/header'
-import LayoutLeftDrawer from 'src/components/layout/left-drawer'
 import Breadcrumbs from 'src/components/layout/breadcrumbs'
 
 import {reactive, onBeforeMount} from 'vue'
@@ -41,7 +39,6 @@ import {use_api} from 'src/composibles/api'
 export default {
   components: {
     LayoutHeader,
-    LayoutLeftDrawer,
     Breadcrumbs,
   },
   setup () {
@@ -54,24 +51,6 @@ export default {
         error: null
       }
     })
-
-    const get_context = async () => {
-      let process = processes.getting_context
-      process.in_progress = true
-
-      const response = await api.get_context()
-      if (response.status === 200) {
-        store.commit('Context/loaded', response.data)
-      } else {
-        process.error = response.data.error
-      }
-      process.in_progress = false
-    }
-
-    onBeforeMount(() => {
-      get_context()
-    })
-
     return {
       processes
     }

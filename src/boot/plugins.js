@@ -9,10 +9,8 @@ export default async ({app, store}) => {
       return {
         Auth: {
           access_token: state.Auth.access_token,
-          account: state.Auth.account,
-          roles: state.Auth.roles,
-          permissions: state.Auth.permissions,
-          apps: state.Auth.apps,
+          user: state.Auth.user,
+          roles: state.Auth.user.roles,
         },
       }
     }
