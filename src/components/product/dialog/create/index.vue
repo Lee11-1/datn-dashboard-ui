@@ -3,7 +3,7 @@
       <q-card style="width: 700px; max-width: 99vw;">
         <q-item>
           <q-item-section>
-            <q-item-label class="text-h6">Create User</q-item-label>
+            <q-item-label class="text-h6">Create Product</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-btn dense flat round icon="close" @click="toggle"/>
@@ -11,9 +11,9 @@
         </q-item>
         <q-separator/>
         <q-card-section class="q-pa-none">
-          <user-form v-model="form_data"
-                          :isUpdate="false"
-                          ref="form"/>
+          <product-form v-model="form_data"
+                        :isUpdate="false"
+                        ref="form"/>
         </q-card-section>
         <q-card-section v-if="process.error">
           <q-item dark class="bg-negative">
@@ -43,11 +43,11 @@
   
   import {use_api} from 'src/composibles/api'
   
-  import UserForm from '../form'
+  import ProductForm from '../form'
   
   export default {
     components: {
-        UserForm
+        ProductForm
     },
     props: {
       
@@ -75,14 +75,13 @@
       const create = async () => {
         process.in_progress = true
         process.error = null
-        const response = await api.create_user(form_data.value)
-        if (response.status === 201) {
-        console.log('create user response', response)
-
-          context.emit('updated', response.data.data)
+        const response = await api.create_product(form_data.value)
+        console.log('create product response', response)
+        if (response.success) {
+          context.emit('updated', response.data)
           $q.notify({
             type: 'positive',
-            message: 'User created!'
+            message: 'Product created!'
           })
           toggle()
         } else {

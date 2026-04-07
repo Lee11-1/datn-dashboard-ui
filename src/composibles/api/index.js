@@ -152,11 +152,97 @@ class Api {
     )
   }
 
+  create_user (payload) {
+    return this.do_request(
+      '/api/users',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
 
+  list_products (payload) {
+    return this.do_request(
+      '/api/products',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  create_product (payload) {
+    return this.do_request(
+      '/api/products',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_product (payload) {
+    return this.do_request(
+      '/api/products',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
+  delete_product (payload) {
+    return this.do_request(
+      '/api/products',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
+  list_categories (payload) {
+    return this.do_request(
+      '/api/categories',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  create_category (payload) {
+    return this.do_request(
+      '/api/categories',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_category (payload) {
+    return this.do_request(
+      '/api/categories',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
+  delete_category (payload) {
+    return this.do_request(
+      '/api/categories',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
 
 }
-
-export default Api
 
 export const use_api = () => {
   const router = useRouter()

@@ -10,6 +10,13 @@
                    :rules="!isUpdate ? form_data.rules.required : []" />
         </div>
         <div class="col-12">
+            <div class="tour-detail-title">Password</div>
+            <q-input v-model="form_data.values.password"
+                   dense type="password" outlined
+                   :rules="!isUpdate ? form_data.rules.required : []"
+                   :hint="isUpdate ? 'Leave blank to keep current password' : 'Enter password'" />
+        </div>
+        <div class="col-12">
             <div class="tour-detail-title">Username</div>
             <q-input v-model="form_data.values.username"
                    dense type="text" outlined
@@ -68,6 +75,7 @@
         let form = object_assign({
             id: null,
             email: null,
+            password: null,
             username: null,
             fullName: null,
             phone: null,

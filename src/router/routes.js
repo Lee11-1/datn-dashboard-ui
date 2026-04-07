@@ -26,6 +26,22 @@ export default [
           admin_require: true
         },
       },
+      {
+        name: 'main.products',
+        path: 'products',
+        component: () => import('pages/main/products'),
+        meta: {
+          admin_require: true
+        },
+      },
+      {
+        name: 'main.categories',
+        path: 'categories',
+        component: () => import('pages/main/categories'),
+        meta: {
+          admin_require: true
+        },
+      },
     ]
   },
   {

@@ -2,7 +2,7 @@
   <q-page class="q-pa-lg">
     <div class="row items-center q-pb-md justify-between">
       <div class="text-h6 q-pr-sm">
-        Users
+        Product
       </div>
       <q-btn color="primary" 
              label="Create" 
@@ -10,21 +10,21 @@
              @click="$refs.detail_dialog.toggle()"
              style="margin-right: 10px" />
     </div>
-    <user-table ref="table" />
+    <product-table ref="table" />
   </q-page>
-  <create-user ref="detail_dialog"
-               @updated="val => handle_user_created(val)" />
+  <create-product ref="detail_dialog"
+               @updated="val => handle_product_created(val)" />
 </template>
 <script>
 import {ref} from 'vue'
 
-import UserTable from 'components/user/table'
-import CreateUser from 'components/user/dialog/create'
+import ProductTable from 'components/product/table'
+import CreateProduct from 'components/product/dialog/create'
 
 export default {
   components: {
-    UserTable,
-    CreateUser
+    ProductTable,
+    CreateProduct
   },
   setup () {
     const table = ref(null)

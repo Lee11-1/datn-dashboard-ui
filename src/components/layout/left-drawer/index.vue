@@ -95,6 +95,18 @@ export default {
           'label': 'Users',
           'icon': 'person',
           'order': 2
+        },
+        {
+          'name': 'main.products',
+          'label': 'Products',
+          'icon': 'grid_view',
+          'order': 3
+        },
+        {
+          'name': 'main.categories',
+          'label': 'Categories',
+          'icon': 'category',
+          'order': 4
         }
       )
     }else{
