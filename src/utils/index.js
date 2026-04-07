@@ -31,6 +31,18 @@ export const get_now = () => {
   return moment()
 }
 
+export const object_assign = (target, ...sources) => {
+  sources.forEach(source => {
+    Object.keys(source).forEach(key => {
+      let source_val = source[key]
+      let target_val = target[key]
+      target[key] = target_val && source_val && typeof target_val === 'object' && typeof source_val === 'object'
+                  ? object_assign(target_val, source_val)
+                  : source_val
+    })
+  })
+  return target
+}
 
 export const convert_date_to_string = (date, format) => {
   if (format === 'iso') return date.toISOString()

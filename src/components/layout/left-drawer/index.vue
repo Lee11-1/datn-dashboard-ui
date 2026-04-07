@@ -83,8 +83,7 @@ export default {
     const site = route.params.site
     let routes = [], others_routes = []
     console.log('check role', store.state.Auth.roles)
-    // let check_roles = store.state.Auth.roles.some(r => r === ROLE_CODES.admin)
-    let check_roles = true
+    let check_roles = store.state.Auth.roles.some(r => r === ROLE_CODES.admin)
     let tour_child = [
 
     ]

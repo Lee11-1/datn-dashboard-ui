@@ -13,11 +13,19 @@ export default [
         name: 'main.home',
         path: 'home',
         meta: {
-          label: 'Applications',
-          icon: 'apps'
+          label: 'Home',
+          icon: 'home'
         },
         component: () => import('pages/main/home'),
-      }
+      },
+       {
+        name: 'main.users',
+        path: 'users',
+        component: () => import('pages/main/users'),
+        meta: {
+          admin_require: true
+        },
+      },
     ]
   },
   {

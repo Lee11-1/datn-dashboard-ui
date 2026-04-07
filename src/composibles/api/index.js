@@ -122,6 +122,36 @@ class Api {
     )
   }
 
+  list_users (payload) {
+    return this.do_request(
+      '/api/users',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  delete_user (payload) {
+    return this.do_request(
+      '/api/users',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
+  update_user (payload) {
+    return this.do_request(
+      '/api/users',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
 
 
 }
