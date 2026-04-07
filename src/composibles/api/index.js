@@ -105,10 +105,10 @@ class Api {
     return response
   }
 
-  authenticate ({email, password}) {
+  authenticate ({username, password}) {
 
     const payload = {
-      email,
+      username,
       password,
       scope_type: 'System'
     }

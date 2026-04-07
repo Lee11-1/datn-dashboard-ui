@@ -10,7 +10,7 @@ export default async ({app, store}) => {
         Auth: {
           access_token: state.Auth.access_token,
           user: state.Auth.user,
-          roles: state.Auth.user.roles,
+          roles: state.Auth.roles,
         },
       }
     }

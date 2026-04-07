@@ -1,29 +1,44 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-page class="auth-background">
-        <div class="column window-height">
+      <q-page>
+        <div class="column window-height backgound">
           <div class="row justify-center q-my-auto">
-            <div class="row justify-center col-12 col-lg-4">
-              <q-img :ratio="1" width="390px" :src="ota_logo"/>
-            </div>
-            <div class="row justify-center col-12 col-lg-4">
-              <div class="window">
-                <div class="text-h3 q-py-lg text-primary text-weight-medium">Sign In</div>
-                <div>
-                  <q-form @submit="authenticate" greedy>
-                    <div class="row q-col-gutter-sm">
-                      <div class="col-12 q-py-sm">
-                        <input type="email" required
-                               v-model="form.values.email"
-                               class="full-width form-control"
-                               placeholder="Your email">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+              <q-card>
+                <div class="row items-center q-py-xl text-center">
+                  <div class="col-12 text-weight-bolder text-h5 tittle-login">
+                    <a @click="redirec_tazoom()">MY DASHBOARD</a>
+                  </div>
+                </div>
+                <q-card-section class="q-pb-xl">
+                  <q-form @submit="login" greedy>
+                    <div class="row q-col-gutter-sm q-ml-none">
+                      <div class="col-12 q-px-lg">
+                        <q-input
+                          outlined dense
+                          clearable
+                          v-model="form.values.username"
+                          label="Username"
+                          :rules="form.rules.username"
+                        >
+                          <template v-slot:append>
+                            <q-icon name="mdi-email"/>
+                          </template>
+                        </q-input>
                       </div>
-                      <div class="col-12 q-py-sm">
-                        <input type="password" required
-                               v-model="form.values.password"
-                               class="full-width form-control"
-                               placeholder="Your password">
+                      <div class="col-12 q-px-lg">
+                        <q-input
+                          outlined dense
+                          type="password"
+                          v-model="form.values.password"
+                          label="Password"
+                          :rules="form.rules.password"
+                        >
+                          <template v-slot:append>
+                            <q-icon name="mdi-lock"/>
+                          </template>
+                        </q-input>
                       </div>
                       <div class="col-12"
                            v-if="processes.authenticating.error_code">
@@ -31,20 +46,30 @@
                           {{ processes.authenticating.error_code }}
                         </q-chip>
                       </div>
-                      <div class="col-12">
-                        <div class="row q-py-lg">
-                          <q-btn label="Sign in"
-                                 size="lg" no-caps
-                                 type="submit" dense
-                                 class="full-width"
-                                 :loading="processes.authenticating.in_progress"
-                                 unelevated color="primary"/>
-                        </div>
+                      <div class="col-12 q-px-lg">
+                        <q-btn label="Sign In"
+                                type="submit"
+                                class="full-width"
+                                :loading="processes.authenticating.in_progress"
+                                unelevated color="primary"/>
+                      </div>
+                      <div class="col-12 text-center q-pt-md cursor-pointer" @click="this.$refs.b2b_forget_password_dialog.open()">
+                        Forgot Password?
+                      </div>
+                      <div class="col-12 text-center q-pt-xs">
+                        Don't have an account? 
+                        <a class="text-primary cursor-pointer" @click="get_redirect()">
+                        Sign Up
+                        </a>
                       </div>
                     </div>
                   </q-form>
-                </div>
-              </div>
+                </q-card-section>
+              </q-card>
+             <b2b-welcome-dialog ref="b2b_welcome_dialog"
+                                 @registered="this.$refs.b2b_register_success_dialog.open()"/>
+             <b2b-forget-password-dialog ref="b2b_forget_password_dialog" />
+             <!-- <b2b-register-success-dialog ref="b2b_register_success_dialog" /> -->
             </div>
           </div>
         </div>
@@ -55,23 +80,42 @@
 <script>
 import {reactive} from 'vue'
 import {useRouter, useRoute} from "vue-router"
-
+// import B2bWelcomeDialog from 'src/pages/static/sign-up/welcome'
+// import B2bRegisterSuccessDialog from 'src/pages/static/sign-up/b2c-register/index.vue'
+// import B2bForgetPasswordDialog from 'src/pages/static/forget-password-dialog.vue'
 import {use_api} from 'src/composibles/api'
 import {useStore} from 'vuex'
 
 export default {
+  components:{
+    // B2bWelcomeDialog,
+    // B2bForgetPasswordDialog,
+    // B2bRegisterSuccessDialog,
+  },
   setup () {
     const store = useStore()
     const route = useRoute()
     const router = useRouter()
     const api = use_api()
-    const ota_logo = require('src/assets/images/ota_logo.svg')
-
+    const get_redirect = () => {
+      let result = {
+        name: 'main.sign-up',
+      }
+      router.push(result)
+    }
     const form = reactive({
       valid: false,
       values: {
-        email: '',
+        username: '',
         password: '',
+      },
+      rules: {
+        username: [
+          v => (!!v && !!v.trim()) || 'Required!'
+        ],
+        password: [
+          v => (!!v && !!v.trim()) || 'Required!'
+        ]
       }
     })
 
@@ -83,17 +127,20 @@ export default {
       }
     })
 
-    const authenticate = async () => {
+    const login = async () => {
       let process = processes.authenticating
       if (process.in_progress) return
       process.in_progress = true
       process.error_code = null
       process.error_message = null
 
+      let payload = {...form.values}
+      // payload.password = btoa(form.values.password)
+
       const response = await api.authenticate(form.values)
       if (response.status === 200) {
+        // success
         store.commit('Auth/signed_in', response.data.data)
-
         await router.push(route.query.callback || '/')
       } else {
         process.error_code = response.data.error
@@ -101,45 +148,25 @@ export default {
       }
       process.in_progress = false
     }
-
+    
     return {
       form,
       processes,
-      authenticate,
-      ota_logo
+      login,
+      get_redirect
+    }
+  },
+  methods:{
+    redirec_tazoom(){
+      let tazoom_link = process.env.FRONTEND_URL
+      if(tazoom_link){
+          window.location.href = tazoom_link
+      }else{
+          window.location.reload()
+      }
     }
   }
 }
 </script>
-<style lang="scss">
-.window{
-  width:400px;
-  height:380px;
-  padding:40px;
-  text-align:center;
-  // border:1px solid white;
-  border-radius:20px;
-  backdrop-filter:blur(35px) brightness(200%);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  color:white;
-}
-input[type="email"], input[type="password"]{
-  padding: 0 10px;
-  height: 40px;
-  border:1px solid white;
-  color:white !important;
-  background:transparent;
-}
 
-input[type="email"]:focus, input[type="password"]:focus{
-  background:#00000040;
-  box-shadow:none;
-  border:1px solid white;
-}
-input[type="email"]::placeholder, input[type="password"]::placeholder{
-  color:white;
-}
-</style>
+

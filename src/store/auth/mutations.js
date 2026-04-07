@@ -1,7 +1,7 @@
 export const signed_in = (state, data) => {
   state.access_token = data.access_token
   state.user = data.user
-  state.roles = data.user.roles
+  state.roles = [data.user.role]
 }
 
 export const signed_out = (state) => {

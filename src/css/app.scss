@@ -1,4 +1,69 @@
-.auth-background {
-    background-image: url('src/assets/images/ota_background.jpg');
-    background-size: cover;
+:root {
+    --primary-color: #6FCE66
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+@font-face {
+    font-family: 'Aharoni';
+    src: url('https://d2c4ewnb0xxi3f.cloudfront.net/cms/vnzamazing-tour/fonts/Aharoni Bold.ttf');
+    font-style: normal;
+    font-stretch: normal;
+    font-weight : 500;
+}
+
+.backgound {
+    background-image: url("https://drxp4nsypg3ox.cloudfront.net/cms/vnzamazing-tour/images/b2b_background.png");
+    background-position: bottom;
+    background-size: 100% 50%;
+    background-repeat: no-repeat;
+}
+
+.text-overflow {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.q-field--dense .q-field__label {
+    font-size: 14px;
+    top: 5px;
+}
+
+.q-field--dense.q-field--float .q-field__label {
+    transform: translateY(-30%) scale(0.9);
+}
+
+.left-drawer {
+    color: #90959A;
+    background-color: #212B36;
+    background-image: url("https://drxp4nsypg3ox.cloudfront.net/cms/vnzamazing-tour/images/b2b_left_drawer_top.png"),
+                      url("https://drxp4nsypg3ox.cloudfront.net/cms/vnzamazing-tour/images/b2b_left_drawer_bottom.png") ;
+    background-repeat: no-repeat;
+    background-position: top, bottom;
+
+    .separator {
+        background-color: #90959A;
+      }
+
+    .app-name {
+        font-weight: 700;
+        font-size: 24px
+    }
+
+    .q-item__section--side {
+        padding-right: 8px;
+    }
+
+    .q-item__section--avatar {
+        min-width: 16px;
+    }
+    
+    .q-expansion-item__content {
+        padding-left: 32px;
+    }
 }

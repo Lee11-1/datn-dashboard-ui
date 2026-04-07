@@ -25,3 +25,14 @@ export const validators = {
     return product_list_regex.test(String(val))
   }
 }
+
+
+export const get_now = () => {
+  return moment()
+}
+
+
+export const convert_date_to_string = (date, format) => {
+  if (format === 'iso') return date.toISOString()
+  return date.utc().format(format)
+}
