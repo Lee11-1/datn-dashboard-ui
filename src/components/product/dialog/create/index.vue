@@ -75,10 +75,16 @@
       const create = async () => {
         process.in_progress = true
         process.error = null
+        
+        const uploadSuccess = await form.value.uploadFiles()
+        if (!uploadSuccess && form.value.selectedFiles.length > 0) {
+          process.in_progress = false
+          return
+        }
+        
         const response = await api.create_product(form_data.value)
-        console.log('create product response', response)
-        if (response.success) {
-          context.emit('updated', response.data)
+        if (response.status === 201 && response.data) {
+          context.emit('updated', response.data.data)
           $q.notify({
             type: 'positive',
             message: 'Product created!'

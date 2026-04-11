@@ -35,9 +35,16 @@ export default {
       }
     }
 
+    const handle_product_created = (val) => {
+      if (table.value) {
+        table.value.list_records()
+      }
+    }
+
     return {
       table,
       handle_user_created,
+      handle_product_created,
     }
   }
 }

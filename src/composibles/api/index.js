@@ -242,6 +242,28 @@ class Api {
     )
   }
 
+  upload_files (payload, progress_handler) {
+    return this.do_request(
+      '/api/aws/upload',
+      {
+        method: 'post',
+        payload,
+        progress_handler
+      }
+    )
+  }
+
+
+  delete_images (payload) {
+    return this.do_request(
+      '/api/aws/delete',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
 }
 
 export const use_api = () => {

@@ -58,6 +58,7 @@
       const showed = ref(false)
       const form = ref(null)
       const form_data = ref({})
+      const originalImages = ref([])
       const process = reactive({
         in_progress: false,
         error: null,
@@ -69,8 +70,11 @@
         if (showed.value) {
           // closing logic
           form_data.value = {}
+          originalImages.value = []
         } else {
           form_data.value = data
+          // Save original images for comparison
+          originalImages.value = data.images ? [...data.images] : []
         }
         showed.value = !showed.value
       }
@@ -78,26 +82,63 @@
       const update = async () => {
         process.in_progress = true
         process.error = null
-        let payload = {
-          ...form_data.value,
-          product_id: form_data.value.id
-        }
-        const response = await api.update_product(payload)
-        console.log('update product response', response)
-        if (response.success) {
-          context.emit('updated', response.data)
-          $q.notify({
-            type: 'positive',
-            message: 'Product updated!'
-          })
-          toggle()
-        } else {
+        
+        try {
+          let newImageUrls = []
+          if (form.value.selectedFiles && form.value.selectedFiles.length > 0) {
+            const uploadSuccess = await form.value.uploadFiles()
+            if (!uploadSuccess) {
+              process.in_progress = false
+              return
+            }
+            const currentImages = form.value.form_data.values.images
+            newImageUrls = currentImages.filter(img => img.startsWith('http'))
+          }
+          
+          const deletedImages = originalImages.value.filter(img => 
+            !form.value.form_data.values.images.includes(img)
+          )
+          
+          if (deletedImages.length > 0) {
+            try {
+              await api.delete_images({ fileUrls: deletedImages })
+            } catch (error) {
+              console.error('Error deleting images:', error)
+            }
+          }
+          
+          // Step 3: Update product with new images
+          let payload = {
+            ...form_data.value,
+            product_id: form_data.value.id,
+            images: form.value.form_data.values.images
+          }
+          
+          const response = await api.update_product(payload)
+          console.log('update product response', response)
+          const data = response.data.data
+          if (response.status === 200 && data) {
+            context.emit('updated', data)
+            $q.notify({
+              type: 'positive',
+              message: 'Product updated!'
+            })
+            toggle()
+          } else {
+            $q.notify({
+              type: 'negative',
+              message: response.message || 'Server Error'
+            })
+          }
+        } catch (error) {
+          console.error('Update error:', error)
           $q.notify({
             type: 'negative',
-            message: response.message || 'Server Error'
+            message: 'Update failed: ' + error.message
           })
+        } finally {
+          process.in_progress = false
         }
-        process.in_progress = false
       }
 
       return {

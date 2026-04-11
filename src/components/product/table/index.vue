@@ -171,17 +171,16 @@ export default {
         sorts: `${pagination.value.descending ? '-' : '+'}${pagination.value.sortBy}`,
       }
       const response = await api.list_products(payload)
-      console.log('list products', response)
-
-      if (response.success) {
-        let result = response.data.map((item, index) => {
+      const data = response.data.data
+      if (response.status === 200 && data) {
+        let result = data.map((item, index) => {
           return {
             ...item,
             index: index
           }
         })
         records.value = result
-        pagination.value.rowsNumber = response.pagination.total
+        pagination.value.rowsNumber = response.data.pagination.total
       }
       process.in_progress = false
     }
@@ -194,7 +193,7 @@ export default {
         product_id: record.id,
       }
       const response = await api.delete_product(payload)
-      if (response.success) {
+      if (response.status === 200) {
         let index = records.value.findIndex(r => r.id === record.id)
         if (index > -1) records.value.splice(index, 1)
         $q.notify({

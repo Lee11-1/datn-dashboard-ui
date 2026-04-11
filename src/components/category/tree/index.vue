@@ -35,6 +35,7 @@
           <category-form v-model="selectedCategory"
                          :parentCategories="categoryList"
                          @updated="onCategoryUpdated"
+                         @deleted="onCategoryDeleted"
                          ref="form" />
         </q-card-section>
       </q-card>
@@ -83,10 +84,19 @@ export default {
     }
 
     const onCategoryUpdated = (updatedCategory) => {
-      const index = props.categoryList.findIndex(cat => cat.id === updatedCategory.id)
+      const index = props.categoryList.findIndex(cat => cat.id === updatedCategory.category_id)
       if (index >= 0) {
         props.categoryList[index] = updatedCategory
         selectedCategory.value = {...updatedCategory}
+      }
+    }
+
+    const onCategoryDeleted = (deletedCategory) => {
+      const index = props.categoryList.findIndex(cat => cat.id === deletedCategory.category_id)
+      if (index >= 0) {
+        props.categoryList.splice(index, 1)
+        selectedCategoryId.value = null
+        selectedCategory.value = null
       }
     }
 
@@ -97,6 +107,7 @@ export default {
       form,
       onCategorySelected,
       onCategoryUpdated,
+      onCategoryDeleted,
     }
   }
 }

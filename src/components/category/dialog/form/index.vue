@@ -38,8 +38,11 @@
                    unchecked-icon="clear"
                    color="green" />
         </div>
-        <div class="col-12 q-pt-md">
+        <div class="col-6 q-pt-md">
           <q-btn color="primary" label="Save" @click="save_category" :loading="process.in_progress" class="full-width" />
+        </div>
+        <div class="col-6 q-pt-md">
+          <q-btn color="negative" label="Delete" @click="delete_category" :loading="process.in_progress" class="full-width" />
         </div>
         <div class="col-12" v-if="process.error">
           <q-item dark class="bg-negative">
@@ -123,8 +126,8 @@
         }
         const response = await api.update_category(payload)
         console.log('update category response', response)
-        if (response.success) {
-          context.emit('updated', response.data)
+        if (response.status === 200) {
+          context.emit('updated', payload)
           $q.notify({
             type: 'positive',
             message: 'Category updated!'
@@ -138,6 +141,31 @@
         }
         process.in_progress = false
       }
+
+      const delete_category = async () => {
+        if (window.confirm('Are you sure you want to delete this category?')) {
+          process.in_progress = true
+          process.error = null
+          let payload = {
+            category_id: form_data.values.id
+          }
+          const response = await api.delete_category(payload)
+          if (response.status === 200) {
+            context.emit('deleted', payload)
+            $q.notify({
+              type: 'positive',
+              message: 'Category deleted!'
+            })
+          } else {
+            process.error_message = response.message || 'Server Error'
+            $q.notify({
+              type: 'negative',
+              message: response.message || 'Server Error'
+            })
+          }
+          process.in_progress = false
+        }
+      }
   
       return {
         form_data,
@@ -145,6 +173,7 @@
         process,
         parentOptions,
         save_category,
+        delete_category,
       }
     }
   }

@@ -60,6 +60,34 @@
                    unchecked-icon="clear"
                    color="green" />
         </div>
+        <div class="col-12">
+            <div class="tour-detail-title">Product Images </div>
+            <div class="file-input-wrapper">
+              <input type="file" 
+                     ref="fileInput"
+                     @change.stop.prevent="onFileSelected"
+                     multiple
+                     accept=".jpg,.jpeg,.png,.gif"
+                     class="file-input-hidden" />
+              <button type="button" @click.prevent="openFileDialog" class="file-input-button">
+                <q-icon name="image" size="20px" class="q-mr-sm" />
+                Choose Files
+              </button>
+            </div>
+            <div class="row q-col-gutter-sm q-mt-md">
+              <div v-for="(image, index) in form_data.values.images" :key="index" class="col-4">
+                <div class="image-preview-container" @mouseenter="hoveredImageIndex = index" @mouseleave="hoveredImageIndex = null">
+                  <img :src="image" style="width: 100%; height: 100%; object-fit: cover;" />
+                  <q-btn v-if="hoveredImageIndex === index" 
+                         dense flat round color="white" 
+                         icon="close"
+                         @click="deleteImage(index)"
+                         class="delete-btn"
+                         style="background-color: rgba(0, 0, 0, 0.6);" />
+                </div>
+              </div>
+            </div>
+        </div>
       </div>
     </q-form>
   </template>
@@ -78,8 +106,12 @@
       const api = use_api()
       const $q = useQuasar()
       const form = ref(null)
+      const fileInput = ref(null)
       const showed = ref(false)
       const allCategories = ref([])
+      const selectedFiles = ref([])
+      const hoveredImageIndex = ref(null)
+      const isUploading = ref(false)
 
       const init_form_values = () => {
         let form = object_assign({
@@ -101,6 +133,13 @@
 
       const categoryOptions = computed(() => {
         return allCategories.value
+      })
+
+      const selectedFileNames = computed(() => {
+        if (selectedFiles.value.length === 0) {
+          return 'No file chosen'
+        }
+        return selectedFiles.value.map(f => f.name).join(', ')
       })
 
       const list_all_categories = async () => {
@@ -138,14 +177,185 @@
       onBeforeMount(() => {
         list_all_categories()
       })
+
+      const onFileRejected = (rejectedEntries) => {
+        $q.notify({
+          type: 'negative',
+          message: 'File rejected. Max 5MB each, only jpg/jpeg/png/gif'
+        })
+      }
+
+      const openFileDialog = () => {
+        if (fileInput.value) {
+          fileInput.value.click()
+        }
+      }
+
+      const onFileSelected = (event) => {
+        const files = event.target.files
+        if (files && files.length > 0) {
+          // Append new files to selectedFiles
+          for (let file of files) {
+            selectedFiles.value.push(file)
+            
+            // Create preview
+            const reader = new FileReader()
+            reader.onload = (e) => {
+              form_data.values.images.push(e.target.result)
+            }
+            reader.readAsDataURL(file)
+          }
+          
+          // Reset file input
+          fileInput.value.value = ''
+        }
+      }
+
+      const deleteImage = (index) => {
+        form_data.values.images.splice(index, 1)
+        if (selectedFiles.value && selectedFiles.value.length > index) {
+          selectedFiles.value.splice(index, 1)
+        }
+      }
+
+      const uploadFiles = async () => {
+        if (selectedFiles.value.length === 0) {
+          return true
+        }
+        
+        try {
+          isUploading.value = true
+          const formData = new FormData()
+          formData.append('folder_name', 'products')
+          
+          for (let file of selectedFiles.value) {
+            formData.append('files', file)
+          }
+
+          const response = await api.upload_files(formData)
+          const data = response.data.data
+
+          if ((response.status === 201) && data && data.uploadedFiles && data.uploadedFiles.length > 0) {
+            // Keep existing AWS URLs and append new uploaded URLs
+            const existingAwsUrls = form_data.values.images.filter(img => img.startsWith('http'))
+            const newUploadedUrls = data.uploadedFiles.map(f => f.url)
+            form_data.values.images = [...existingAwsUrls, ...newUploadedUrls]
+
+            selectedFiles.value = []
+            $q.notify({
+              type: 'positive',
+              message: data.uploadedFiles.length + ' image(s) uploaded successfully!'
+            })
+            return true
+          } else {
+            $q.notify({
+              type: 'negative',
+              message: response.message || 'Upload failed'
+            })
+            return false
+          }
+        } catch (error) {
+          console.error('Upload error:', error)
+          $q.notify({
+            type: 'negative',
+            message: 'Upload error: ' + error.message
+          })
+          return false
+        } finally {
+          isUploading.value = false
+        }
+      }
   
       return {
         showed,
         form_data,
         form,
+        fileInput,
         toggle,
         categoryOptions,
+        selectedFiles,
+        selectedFileNames,
+        uploadFiles,
+        onFileRejected,
+        onFileSelected,
+        openFileDialog,
+        hoveredImageIndex,
+        isUploading,
+        deleteImage,
       }
     }
   }
   </script>
+
+<style scoped>
+.image-preview-container {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.delete-btn {
+  position: absolute !important;
+  top: 4px;
+  right: 4px;
+  transform: scale(1);
+  transition: all 0.2s ease-in-out;
+}
+
+.delete-btn:hover {
+  transform: scale(1.15);
+}
+
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.file-input-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border: 2px solid #1976d2;
+  background-color: white;
+  color: #1976d2;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.file-input-button:hover {
+  background-color: #f0f7ff;
+  border-color: #1565c0;
+  color: #1565c0;
+}
+
+.file-input-button:active {
+  background-color: #1976d2;
+  color: white;
+  transform: scale(0.98);
+}
+
+.file-input-display {
+  padding: 10px 12px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: #666;
+  font-size: 13px;
+  word-break: break-word;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+</style>
