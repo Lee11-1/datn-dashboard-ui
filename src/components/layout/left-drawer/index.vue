@@ -47,14 +47,6 @@
               </q-item-section>
             </q-item>
           </div>
-          <q-item clickable @click="redirect_supplier_terms_conditions">
-            <q-item-section avatar>
-              <q-icon name="domain"/>
-            </q-item-section>
-            <q-item-section>
-              Supplier Terms & Conditions
-            </q-item-section>
-        </q-item>
         <q-item clickable @click="logout">
           <q-item-section avatar>
             <q-icon name="logout"/>
@@ -107,6 +99,18 @@ export default {
           'label': 'Categories',
           'icon': 'category',
           'order': 4
+        },
+        {
+          'name': 'main.customers',
+          'label': 'Customers',
+          'icon': 'people',
+          'order': 5
+        },
+        {
+          'name': 'main.zones',
+          'label': 'Zones',
+          'icon': 'map',
+          'order': 6
         }
       )
     }else{

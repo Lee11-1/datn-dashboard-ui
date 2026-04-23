@@ -264,6 +264,104 @@ class Api {
     )
   }
 
+  list_customers (payload) {
+    return this.do_request(
+      '/api/customers',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  create_customer (payload) {
+    return this.do_request(
+      '/api/customers',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_customer (payload) {
+    return this.do_request(
+      '/api/customers',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
+  delete_customer (payload) {
+    return this.do_request(
+      '/api/customers',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
+  search_customers (term) {
+    return this.do_request(
+      `/api/customers/search/${term}`,
+      {
+        method: 'get',
+      }
+    )
+  }
+
+  get_customers_by_zone (zoneId) {
+    return this.do_request(
+      `/api/customers/zone/${zoneId}`,
+      {
+        method: 'get',
+      }
+    )
+  }
+
+  list_zones (payload) {
+    return this.do_request(
+      '/api/zones',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  create_zone (payload) {
+    return this.do_request(
+      '/api/zones',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_zone (payload) {
+    return this.do_request(
+      '/api/zones',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
+  delete_zone (payload) {
+    return this.do_request(
+      '/api/zones',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
 }
 
 export const use_api = () => {

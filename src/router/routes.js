@@ -42,6 +42,22 @@ export default [
           admin_require: true
         },
       },
+       {
+        name: 'main.customers',
+        path: 'customers',
+        component: () => import('pages/main/customers'),
+        meta: {
+          admin_require: true
+        },
+      },
+      {
+        name: 'main.zones',
+        path: 'zones',
+        component: () => import('pages/main/zones'),
+        meta: {
+          admin_require: true
+        },
+      }
     ]
   },
   {

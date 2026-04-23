@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Location Test</title>
+  </head>
+
+  <body>
+    <h2>Location Test</h2>
+
+    <button onclick="getLocation()">Get Location</button>
+
+    <div id="result"></div>
+
+    <script>
+      async function getLocation() {
+        const result = document.getElementById("result");
+
+        if (!navigator.geolocation) {
+          result.innerHTML = "Geolocation not supported";
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            result.innerHTML = "Getting address...";
+
+            try {
+              const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+              );
+
+              const data = await response.json();
+
+              result.innerHTML = `
+                <div>
+                  <p><strong>Latitude:</strong> ${lat}</p>
+                  <p><strong>Longitude:</strong> ${lon}</p>
+                  <p><strong>Accuracy:</strong> ${accuracy} meters</p>
+                  <p><strong>City:</strong> ${
+                    data.address.city ||
+                    data.address.town ||
+                    data.address.state
+                  }</p>
+                  <p><strong>Country:</strong> ${data.address.country}</p>
+                  <p><strong>Full address:</strong> ${data.display_name}</p>
+                </div>
+              `;
+            } catch (error) {
+              result.innerHTML = error;
+            }
+          },
+          (error) => {
+            result.innerHTML = error.message;
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0,
+          }
+        );
+      }
+    </script>
+  </body>
+</html>
