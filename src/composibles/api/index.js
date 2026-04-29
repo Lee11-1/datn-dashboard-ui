@@ -362,6 +362,103 @@ class Api {
     )
   }
 
+  list_schedules (payload) {
+    return this.do_request(
+      '/api/schedules',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  create_schedule (payload) {
+    return this.do_request(
+      '/api/schedules',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_schedule (payload) {
+    return this.do_request(
+      '/api/schedules',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
+  delete_schedule (payload) {
+    return this.do_request(
+      '/api/schedules',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
+  get_schedule_statistics (payload) {
+    return this.do_request(
+      '/api/schedules/stats/overview',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  get_schedules_by_date (date) {
+    return this.do_request(
+      `/api/schedules/date/${date}`,
+      {
+        method: 'get',
+      }
+    )
+  }
+
+  get_schedules_by_zone (zoneId) {
+    return this.do_request(
+      `/api/schedules/zone/${zoneId}`,
+      {
+        method: 'get',
+      }
+    )
+  }
+
+  get_schedules_by_user (userId) {
+    return this.do_request(
+      `/api/schedules/user/${userId}`,
+      {
+        method: 'get',
+      }
+    )
+  }
+
+  change_schedule_status (payload) {
+    return this.do_request(
+      `/api/schedules/${payload.id}/status`,
+      {
+        method: 'patch',
+        payload,
+      }
+    )
+  }
+
+  assign_schedule_to_warehouse (payload) {
+    return this.do_request(
+      `/api/schedules/${payload.id}/warehouse`,
+      {
+        method: 'patch',
+        payload,
+      }
+    )
+  }
+
 }
 
 export const use_api = () => {

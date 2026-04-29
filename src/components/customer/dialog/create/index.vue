@@ -78,7 +78,7 @@
         process.error = null
         const payload = {
           ...form_data.value,
-          addedBy: store.state.Auth.user.id
+          createdBy: store.state.Auth.user.id
         }
         const response = await api.create_customer(payload)
         console.log('create customer response', response)

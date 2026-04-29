@@ -57,6 +57,14 @@ export default [
         meta: {
           admin_require: true
         },
+      },
+      {
+        name: 'main.schedules',
+        path: 'schedules',
+        component: () => import('pages/main/schedules'),
+        meta: {
+          admin_require: true
+        },
       }
     ]
   },

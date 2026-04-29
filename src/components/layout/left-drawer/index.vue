@@ -111,6 +111,12 @@ export default {
           'label': 'Zones',
           'icon': 'map',
           'order': 6
+        },
+        {
+          'name': 'main.schedules',
+          'label': 'Schedules',
+          'icon': 'schedule',
+          'order': 7
         }
       )
     }else{

@@ -52,7 +52,7 @@
 <script>
 import {computed, ref, onBeforeMount, watch} from 'vue'
 import {useStore} from 'vuex'
-import DatePicker from 'src/components/common/two-date-picker'
+import DatePicker from 'src/components/common/date-picker'
 
 export default {
   components: {DatePicker},
