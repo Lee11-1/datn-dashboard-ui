@@ -65,6 +65,14 @@ export default [
         meta: {
           admin_require: true
         },
+      },
+      {
+        name: 'main.warehouses',
+        path: 'warehouses',
+        component: () => import('pages/main/warehouses'),
+        meta: {
+          admin_require: true
+        },
       }
     ]
   },

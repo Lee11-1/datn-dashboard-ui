@@ -3,7 +3,7 @@
     <q-card style="width: 700px; max-width: 99vw;">
       <q-item>
         <q-item-section>
-          <q-item-label class="text-h6">Create Schedule</q-item-label>
+          <q-item-label class="text-h6">Create Warehouse</q-item-label>
         </q-item-section>
         <q-item-section side>
           <q-btn dense flat round icon="close" @click="toggle"/>
@@ -11,9 +11,9 @@
       </q-item>
       <q-separator/>
       <q-card-section class="q-pa-none">
-        <schedule-form v-model="form_data"
-                       :isUpdate="false"
-                       ref="form"/>
+        <warehouse-form v-model="form_data"
+                        :isUpdate="false"
+                        ref="form"/>
       </q-card-section>
       <q-card-section v-if="process.error">
         <q-item dark class="bg-negative">
@@ -43,11 +43,11 @@ import {useQuasar} from 'quasar'
 import {useStore} from 'vuex'
 import {use_api} from 'src/composibles/api'
 
-import ScheduleForm from '../form'
+import WarehouseForm from '../form'
 
 export default {
   components: {
-    ScheduleForm
+    WarehouseForm
   },
   props: {
     
@@ -78,15 +78,14 @@ export default {
       process.error = null
       const payload = {
         ...form_data.value,
-        createdBy: store.state.Auth.user.id
       }
-      const response = await api.create_schedule(payload)
-      console.log('create schedule response', response)
+      const response = await api.create_warehouse(payload)
+      console.log('create warehouse response', response)
       if (response.status === 201) {
         context.emit('updated', response.data)
         $q.notify({
           type: 'positive',
-          message: 'Schedule created!'
+          message: 'Warehouse created!'
         })
         toggle()
       } else {
