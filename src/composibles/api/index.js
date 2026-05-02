@@ -517,6 +517,46 @@ class Api {
     )
   }
 
+  list_inventory (payload) {
+    return this.do_request(
+      '/inventory',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  create_inventory (payload) {
+    return this.do_request(
+      '/inventory',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_inventory (payload) {
+    return this.do_request(
+      '/inventory',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
+  delete_inventory (payload) {
+    return this.do_request(
+      '/inventory',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
 }
 
 export const use_api = () => {

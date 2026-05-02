@@ -73,6 +73,14 @@ export default [
         meta: {
           admin_require: true
         },
+      },
+      {
+        name: 'main.inventory',
+        path: 'inventory',
+        component: () => import('pages/main/inventory'),
+        meta: {
+          admin_require: true
+        },
       }
     ]
   },

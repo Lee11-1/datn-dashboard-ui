@@ -123,6 +123,12 @@ export default {
           'label': 'Warehouses',
           'icon': 'warehouse',
           'order': 8
+        },
+        {
+          'name': 'main.inventory',
+          'label': 'Inventory',
+          'icon': 'inventory_2',
+          'order': 9
         }
       )
     }else{
