@@ -1,8 +1,9 @@
 <template>
     <q-form v-model="form_data.valid" greedy
             ref="form"
-            class="row q-col-gutter-sm q-pa-md">
-      <div class="col-12 row q-col-gutter-sm">
+            class="row q-col-gutter-sm q-pa-md"
+            style="height: 100%; display: flex; flex-wrap: wrap;">
+      <div class="col-7 row q-col-gutter-sm">
         <div class="col-12">
             <div class="tour-detail-title">Full Name</div>
             <q-input v-model="form_data.values.fullName"
@@ -23,6 +24,16 @@
             <div class="tour-detail-title">Address</div>
             <q-input v-model="form_data.values.address"
                    dense type="textarea" outlined />
+        </div>
+        <div class="col-6">
+            <div class="tour-detail-title">Latitude</div>
+            <q-input v-model="form_data.values.latitude"
+                   dense type="number" outlined readonly />
+        </div>
+        <div class="col-6">
+            <div class="tour-detail-title">Longitude</div>
+            <q-input v-model="form_data.values.longitude"
+                   dense type="number" outlined readonly />
         </div>
         <div class="col-12">
             <div class="tour-detail-title">Zone</div>
@@ -45,6 +56,14 @@
                    dense type="textarea" outlined />
         </div>
       </div>
+      <div class="col-5" style="display: flex; flex-direction: column;">
+            <div class="tour-detail-title">Location Map</div>
+            <div class="map-container">
+              <Map ref="mapComponent" 
+                   @location-selected="handleLocationSelected"
+                   :initialLocation="form_data.values.location" />
+            </div>
+      </div>
     </q-form>
   </template>
   <script>
@@ -53,8 +72,12 @@
   import debounce from 'lodash/debounce'
   import { object_assign } from 'src/utils'
   import {use_api} from 'src/composibles/api'
+  import Map from 'src/components/common/map'
   
   export default {
+    components: {
+      Map
+    },
     props: {
       modelValue: {type: Object, required: true},
       isUpdate: {type: Boolean, default: false},
@@ -66,6 +89,7 @@
       const showed = ref(false)
       const allZones = ref([])
       const zoneLoading = ref(false)
+      const mapComponent = ref(null)
 
       const init_form_values = () => {
         let form = object_assign({
@@ -74,9 +98,19 @@
             phone: null,
             email: null,
             address: null,
+            latitude: null,
+            longitude: null,
+            location: null,
             zoneId: null,
             note: null,
         }, props.modelValue)
+        
+        // Convert location GeoJSON to lat/lng khi cập nhật
+        if (form.location && form.location.coordinates) {
+          const [lng, lat] = form.location.coordinates
+          form.longitude = lng
+          form.latitude = lat
+        }
         return form
     }
 
@@ -142,7 +176,18 @@
       watch(
           form_data.values,
           (result) => {
-            context.emit('update:modelValue', result)
+            // Convert lat/lng to PostGIS Point location
+            const emitData = {...result}
+            if (result.latitude && result.longitude) {
+              emitData.location = {
+                type: 'Point',
+                coordinates: [parseFloat(result.longitude), parseFloat(result.latitude)]
+              }
+            }
+            // Xóa latitude/longitude khi gửi đi
+            delete emitData.latitude
+            delete emitData.longitude
+            context.emit('update:modelValue', emitData)
           }
       )
   
@@ -154,6 +199,12 @@
         showed.value = !showed.value
       }
 
+      const handleLocationSelected = (locationData) => {
+        form_data.values.latitude = locationData.lat
+        form_data.values.longitude = locationData.lng
+        form_data.values.address = locationData.address
+      }
+
       onMounted(() => {
         load_selected_zone()
       })
@@ -163,10 +214,22 @@
         form_data,
         form,
         toggle,
+        mapComponent,
         zoneOptions,
         zoneLoading,
         handle_zone_filter,
+        handleLocationSelected,
       }
     }
   }
   </script>
+
+<style scoped>
+.map-container {
+  width: 100%;
+  flex: 1;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+</style>

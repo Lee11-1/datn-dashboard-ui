@@ -1,6 +1,6 @@
 <template>
     <q-dialog v-model="showed" persistent>
-      <q-card style="width: 700px; max-width: 99vw;">
+      <q-card style="width: 1500px; max-width: 99vw;">
         <q-item>
           <q-item-section>
             <q-item-label class="text-h6">Create Customer</q-item-label>
