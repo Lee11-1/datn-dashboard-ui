@@ -73,7 +73,7 @@
       </div>
       <div class="col-12">
         <div class="tour-detail-title">Notes</div>
-        <q-input v-model="form_data.values.notes"
+        <q-input v-model="form_data.values.note"
                  dense type="textarea" outlined
                  placeholder="Additional notes"
                  rows="2" />
@@ -132,9 +132,8 @@ export default {
         userId: null,
         status: 'planned',
         priority: 'medium',
-        notes: null,
-        isActive: true,
-        createdBy: store.state.Auth.user.id
+        note: null,
+        isActive: true
       }, props.modelValue)
       return form
     }
@@ -250,32 +249,27 @@ export default {
       }
     })
 
+    const formatDateToString = (date) => {
+      if (!date) return ''
+      const d = new Date(date)
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
+
     watch(
       form_data.values,
       (result) => {
         const newTitle = generateTitle(result.zoneId, result.userId, result.startDate)
-        if (newTitle) {
-          result.title = newTitle
-        }
+        result.title = newTitle || ''
         
+        if (result.startDate) {
+            result.startDate = formatDateToString(result.startDate)
+        }
         if (result.endDate) {
-            const endDate = new Date(result.endDate)
-
-            endDate.setHours(23, 59, 59, 0)
-
-            const pad = (n) => String(n).padStart(2, '0')
-
-            const formatted =
-                endDate.getFullYear() + '-' +
-                pad(endDate.getMonth() + 1) + '-' +
-                pad(endDate.getDate()) + 'T' +
-                pad(endDate.getHours()) + ':' +
-                pad(endDate.getMinutes()) + ':' +
-                pad(endDate.getSeconds()) +
-                '+07:00'
-
-            result.endDate = formatted
-            }
+            result.endDate = formatDateToString(result.endDate)
+        }
         
         context.emit('update:modelValue', result)
       },
@@ -298,6 +292,7 @@ export default {
       handle_zone_filter,
       handle_user_filter,
       generateTitle,
+      formatDateToString,
     }
   }
 }

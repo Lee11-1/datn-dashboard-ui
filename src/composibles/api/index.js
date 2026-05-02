@@ -459,6 +459,64 @@ class Api {
     )
   }
 
+  list_warehouses (payload) {
+    return this.do_request(
+      '/api/warehouses',
+      {
+        method: 'get',
+        payload,
+      }
+    )
+  }
+
+  create_warehouse (payload) {
+    return this.do_request(
+      '/api/warehouses',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_warehouse (payload) {
+    return this.do_request(
+      '/api/warehouses',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
+  delete_warehouse (payload) {
+    return this.do_request(
+      '/api/warehouses',
+      {
+        method: 'delete',
+        payload,
+      }
+    )
+  }
+
+  get_warehouse_by_id (id) {
+    return this.do_request(
+      `/api/warehouses/${id}`,
+      {
+        method: 'get',
+      }
+    )
+  }
+
+  get_warehouses_by_zone (zoneId) {
+    return this.do_request(
+      `/api/warehouses/zone/${zoneId}`,
+      {
+        method: 'get',
+      }
+    )
+  }
+
 }
 
 export const use_api = () => {

@@ -3,7 +3,7 @@
     <q-card style="width: 700px; max-width: 99vw;">
       <q-item>
         <q-item-section>
-          <q-item-label class="text-h6">Create Schedule</q-item-label>
+          <q-item-label class="text-h6">Update Warehouse</q-item-label>
         </q-item-section>
         <q-item-section side>
           <q-btn dense flat round icon="close" @click="toggle"/>
@@ -11,9 +11,9 @@
       </q-item>
       <q-separator/>
       <q-card-section class="q-pa-none">
-        <schedule-form v-model="form_data"
-                       :isUpdate="false"
-                       ref="form"/>
+        <warehouse-form v-model="form_data"
+                        :isUpdate="true"
+                        ref="form"/>
       </q-card-section>
       <q-card-section v-if="process.error">
         <q-item dark class="bg-negative">
@@ -30,9 +30,9 @@
       </q-card-section>
       <q-card-actions align="right">
         <q-btn label="Cancel" flat @click="toggle"/>
-        <q-btn @click="create"
+        <q-btn @click="update"
                :loading="process.in_progress"
-               color="primary" label="Submit"/>
+               color="primary" label="Update"/>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -43,11 +43,11 @@ import {useQuasar} from 'quasar'
 import {useStore} from 'vuex'
 import {use_api} from 'src/composibles/api'
 
-import ScheduleForm from '../form'
+import WarehouseForm from '../form'
 
 export default {
   components: {
-    ScheduleForm
+    WarehouseForm
   },
   props: {
     
@@ -66,27 +66,28 @@ export default {
       error_message: null
     })
 
-    const toggle = () => {
+    const toggle = (data = null) => {
       if (showed.value) {
         form_data.value = {}
+      } else if (data) {
+        form_data.value = data
       }
       showed.value = !showed.value
     }
 
-    const create = async () => {
+    const update = async () => {
       process.in_progress = true
       process.error = null
       const payload = {
         ...form_data.value,
-        createdBy: store.state.Auth.user.id
       }
-      const response = await api.create_schedule(payload)
-      console.log('create schedule response', response)
-      if (response.status === 201) {
+      const response = await api.update_warehouse(payload)
+      console.log('update warehouse response', response)
+      if (response.status === 200) {
         context.emit('updated', response.data)
         $q.notify({
           type: 'positive',
-          message: 'Schedule created!'
+          message: 'Warehouse updated!'
         })
         toggle()
       } else {
@@ -101,7 +102,7 @@ export default {
     return {
       showed,
       toggle,
-      create,
+      update,
       form,
       form_data,
       process,

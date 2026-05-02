@@ -40,14 +40,6 @@
               <q-chip dense :label="props.row.status" size="sm" 
                       :color="getStatusColor(props.row.status)" text-color="white" />
             </q-td>
-            <q-td key="priority" :props="props">
-              <q-chip dense :label="props.row.priority" size="sm" 
-                      :color="getPriorityColor(props.row.priority)" text-color="white" />
-            </q-td>
-            <q-td key="isActive" :props="props">
-              <q-icon :name="props.row.isActive ? 'check_circle' : 'cancel'" 
-                      :color="props.row.isActive ? 'positive' : 'negative'" />
-            </q-td>
             <q-td key="actions" :props="props">
               <q-btn dense round flat icon="edit" color="grey"
                      @click="$refs.detail_dialog.toggle(props.row)"
@@ -91,6 +83,13 @@ export default {
     const $q = useQuasar()
     const router = useRouter()
 
+    const statusOptions = [
+      { label: 'Planned', value: 'planned' },
+      { label: 'Ongoing', value: 'ongoing' },
+      { label: 'Completed', value: 'completed' },
+      { label: 'Cancelled', value: 'cancelled' }
+    ]
+
     const records = ref([])
 
     const columns = computed(() => {
@@ -132,22 +131,6 @@ export default {
           field: 'status',
           label: 'Status',
           align: 'left',
-          headerStyle: 'font-size: 16px;font-weight: 500;padding: 9px 15px;',
-          style: 'font-size: 14px',
-        },
-        {
-          name: 'priority',
-          field: 'priority',
-          label: 'Priority',
-          align: 'left',
-          headerStyle: 'font-size: 16px;font-weight: 500;padding: 9px 15px;',
-          style: 'font-size: 14px',
-        },
-        {
-          name: 'isActive',
-          field: 'isActive',
-          label: 'Active',
-          align: 'center',
           headerStyle: 'font-size: 16px;font-weight: 500;padding: 9px 15px;',
           style: 'font-size: 14px',
         },
@@ -272,29 +255,19 @@ export default {
       return colors[status] || 'grey'
     }
 
-    const getPriorityColor = (priority) => {
-      const colors = {
-        'low': 'blue',
-        'medium': 'green',
-        'high': 'orange',
-        'urgent': 'red'
-      }
-      return colors[priority] || 'grey'
-    }
-
     return {
       records,
       columns,
       pagination,
       filters,
       processes,
+      statusOptions,
       list_records,
       handle_pagination_changed,
       handle_search_changed,
       handle_updated,
       delete_schedule,
       getStatusColor,
-      getPriorityColor,
     }
   }
 }

@@ -8,15 +8,20 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "start": "quasar dev"
+    "start": "quasar dev",
+     "build": "quasar build"
   },
   "dependencies": {
+    "@amcharts/amcharts5": "^5.17.2",
+    "@amcharts/amcharts5-geodata": "^5.1.5",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
     "chart.js": "^4.5.1",
     "codemirror": "^5.65.5",
     "core-js": "^3.6.5",
     "dotenv": "^14.2.0",
+    "leaflet": "^1.9.4",
+    "mapbox-gl": "^3.23.0",
     "moment": "^2.29.1",
     "quasar": "^2.4.12",
     "vue-chartjs": "^5.3.3",

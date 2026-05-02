@@ -6,7 +6,7 @@
           v-model="filters.value.search_text"
           outlined
           dense
-          placeholder="Search zones..."
+          placeholder="Search warehouses..."
           @update:model-value="handle_search_changed"
           clearable>
           <template v-slot:prepend>
@@ -23,23 +23,23 @@
         binary-state-sort
         row-key="id">
         <template v-slot:body="props">
-          <q-tr :props="props" 
-                :class="selectedRowId === props.row.id 
-                  ? 'bg-blue-2' 
-                  : (props.row.index % 2 ? 'bg-grey-2' : '')"
-                @click="handleRowClick(props.row)">
+          <q-tr :props="props" :class="props.row.index % 2 ? 'bg-grey-2': ''">
             <q-td key="createdAt" :props="props">
               <datetime :modelValue="props.row.createdAt" :expect_format="'MMM D, YYYY'" />
             </q-td>
             <q-td key="name" :props="props">
               <span>{{ props.row.name }}</span>
-              <q-tooltip v-if="props.row.nameEn">{{ props.row.nameEn }}</q-tooltip>
             </q-td>
             <q-td key="code" :props="props">
               <span>{{ props.row.code }}</span>
             </q-td>
-            <q-td key="level" :props="props">
-              <q-chip dense :label="props.row.level" size="sm" />
+            <q-td key="address" :props="props">
+              <span class="text-truncate" style="max-width: 200px;">{{ props.row.address }}</span>
+              <q-tooltip v-if="props.row.address">{{ props.row.address }}</q-tooltip>
+            </q-td>
+            <q-td key="location" :props="props">
+              <span>{{ props.row.location }}</span>
+              <q-tooltip v-if="props.row.location">{{ props.row.location }}</q-tooltip>
             </q-td>
             <q-td key="isActive" :props="props">
               <q-icon :name="props.row.isActive ? 'check_circle' : 'cancel'" 
@@ -47,10 +47,10 @@
             </q-td>
             <q-td key="actions" :props="props">
               <q-btn dense round flat icon="edit" color="grey"
-                     @click.stop="$refs.detail_dialog.toggle(props.row)"
+                     @click="$refs.detail_dialog.toggle(props.row)"
                      />
               <q-btn dense flat round icon="delete" color="grey"
-                @click.stop="delete_zone(props.row)"
+                @click="delete_warehouse(props.row)"
                 />
             </q-td>
           </q-tr>
@@ -58,8 +58,8 @@
       </q-table>
     </div>
   </div>
-  <update-zone ref="detail_dialog"
-                   @updated="val => handle_updated(val)" />
+  <update-warehouse ref="detail_dialog"
+                    @updated="val => handle_updated(val)" />
 </template>
 <script>
 import {ref, reactive, computed} from 'vue'
@@ -70,14 +70,13 @@ import debounce from 'lodash/debounce'
 import {use_api} from 'src/composibles/api'
 
 import Datetime from 'src/components/common/datetime'
-import UpdateZone from '../dialog/update'
+import UpdateWarehouse from '../dialog/update'
 
 export default {
   components: {
     Datetime,
-    UpdateZone
+    UpdateWarehouse
   },
-  emits: ['row-selected'],
   props: {
     
   },
@@ -90,7 +89,6 @@ export default {
     const router = useRouter()
 
     const records = ref([])
-    const selectedRowId = ref(null)
 
     const columns = computed(() => {
       let result = [
@@ -119,9 +117,17 @@ export default {
           style: 'font-size: 14px',
         },
         {
-          name: 'level',
-          field: 'level',
-          label: 'Level',
+          name: 'address',
+          field: 'address',
+          label: 'Address',
+          align: 'left',
+          headerStyle: 'font-size: 16px;font-weight: 500;padding: 9px 15px;',
+          style: 'font-size: 14px',
+        },
+        {
+          name: 'location',
+          field: 'location',
+          label: 'Location',
           align: 'left',
           headerStyle: 'font-size: 16px;font-weight: 500;padding: 9px 15px;',
           style: 'font-size: 14px',
@@ -136,27 +142,27 @@ export default {
         },
         {
           name: 'actions',
-          field: 'actions',
-          label: 'Action',
-          align: 'right',
+          label: 'Actions',
+          align: 'left',
           headerStyle: 'font-size: 16px;font-weight: 500;padding: 9px 15px;',
           style: 'font-size: 14px',
         }
       ]
-
       return result
     })
+
     const pagination = ref({
-      sortBy: '',
+      sortBy: 'createdAt',
       descending: true,
       page: 1,
-      rowsPerPage: 25,
+      rowsPerPage: 10,
       rowsNumber: 0
     })
+
     const filters = reactive({
       value: {
-        search_text: "",
-      },
+        search_text: ''
+      }
     })
 
     const processes = reactive({
@@ -165,60 +171,42 @@ export default {
       }
     })
 
-    const list_records = async () => {
-      let process = processes.listing
-      process.in_progress = true
-      
-      let payload = {
-        ...filters.value,
-        page: pagination.value.page,
-        limit: pagination.value.rowsPerPage || pagination.value.rowsNumber,
-        sorts: `${pagination.value.descending ? '-' : '+'}${pagination.value.sortBy}`,
+    const list_records = async (props = null) => {
+      if (!props) {
+        props = {
+          pagination: pagination.value
+        }
       }
-      let response = await api.list_zones(payload)
-      response = response.data
-      console.log('list zones response', response)
-      if (response.success) {
-        let result = response.data.map((item, index) => {
-          return {
-            ...item,
-            index: index
-          }
-        })
-        records.value = result
-        pagination.value.rowsNumber = response.pagination.total
-      }
-      process.in_progress = false
-    }
-
-    const delete_zone = async (record) => {
-      if (!window.confirm('Are you sure to delete this record?')) return
-      let payload = {
-        id: record.id,
-      }
-      const response = await api.delete_zone(payload)
-      if (response.status === 200) {
-        let index = records.value.findIndex(r => r.id === record.id)
-        if (index > -1) records.value.splice(index, 1)
-        $q.notify({
-          type: 'positive',
-          message: 'Zone deleted!'
-        })
-      } else {
+      processes.listing.in_progress = true
+      try {
+        const { page, rowsPerPage, sortBy, descending } = props.pagination
+        const payload = {
+          page: page,
+          limit: rowsPerPage,
+          sorts: sortBy,
+          search_text: filters.value.search_text
+        }
+        const response = await api.list_warehouses(payload)
+        if (response.status === 200 && response.data.success) {
+          records.value = response.data.data || []
+          pagination.value.rowsNumber = response.data.pagination?.total || 0
+          pagination.value.page = page
+          pagination.value.rowsPerPage = rowsPerPage
+          pagination.value.sortBy = sortBy
+          pagination.value.descending = descending
+        }
+      } catch (error) {
+        console.error('Error loading warehouses:', error)
         $q.notify({
           type: 'negative',
-          message: 'Server Error'
+          message: 'Failed to load warehouses'
         })
       }
+      processes.listing.in_progress = false
     }
 
-    const handle_updated = (val) => {
-      list_records()
-    }
-
-    const handle_pagination_changed = async (props) => {
-      pagination.value = props.pagination
-      list_records()
+    const handle_pagination_changed = (props) => {
+      list_records(props)
     }
 
     const handle_search_changed = debounce(() => {
@@ -226,24 +214,54 @@ export default {
       list_records()
     }, 500)
 
-    const handleRowClick = (row) => {
-      selectedRowId.value = row.id
-      context.emit('row-selected', row)
+    const handle_updated = () => {
+      list_records()
+    }
+
+    const delete_warehouse = async (row) => {
+      $q.dialog({
+        title: 'Confirm Delete',
+        message: `Are you sure you want to delete warehouse "${row.name}"?`,
+        cancel: true,
+        persistent: true
+      }).onOk(async () => {
+        processes.listing.in_progress = true
+        try {
+          const response = await api.delete_warehouse({ id: row.id })
+          if (response.status === 200) {
+            $q.notify({
+              type: 'positive',
+              message: 'Warehouse deleted!'
+            })
+            list_records()
+          } else {
+            $q.notify({
+              type: 'negative',
+              message: response.message || 'Failed to delete warehouse'
+            })
+          }
+        } catch (error) {
+          console.error('Error deleting warehouse:', error)
+          $q.notify({
+            type: 'negative',
+            message: 'Error deleting warehouse'
+          })
+        }
+        processes.listing.in_progress = false
+      })
     }
 
     return {
       records,
       columns,
-      filters,
       pagination,
+      filters,
       processes,
-      selectedRowId,
+      list_records,
       handle_pagination_changed,
       handle_search_changed,
-      list_records,
-      delete_zone,
       handle_updated,
-      handleRowClick,
+      delete_warehouse,
     }
   }
 }

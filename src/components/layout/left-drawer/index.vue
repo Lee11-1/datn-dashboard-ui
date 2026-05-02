@@ -117,6 +117,12 @@ export default {
           'label': 'Schedules',
           'icon': 'schedule',
           'order': 7
+        },
+        {
+          'name': 'main.warehouses',
+          'label': 'Warehouses',
+          'icon': 'warehouse',
+          'order': 8
         }
       )
     }else{
