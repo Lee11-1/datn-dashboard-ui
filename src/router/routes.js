@@ -33,6 +33,16 @@ export default [
         meta: {
           admin_require: true
         },
+        children: [
+          {
+            name: 'main.products.detail',
+            path: 'detail/:id',
+            component: () => import('pages/main/products/detail'),
+            meta: {
+              admin_require: true
+            }
+          }
+        ]
       },
       {
         name: 'main.categories',

@@ -31,11 +31,17 @@
               <span v-else style="color: red">●</span>
             </q-td>
             <q-td key="actions" :props="props">
+              <q-btn dense round flat icon="visibility" color="blue"
+                     @click="view_product(props.row)"
+                     title="View Details"
+                     />
               <q-btn dense round flat icon="edit" color="grey"
                      @click="$refs.detail_dialog.toggle(props.row)"
+                     title="Edit"
                      />
-              <q-btn dense flat round icon="delete" color="grey"
+              <q-btn dense flat round icon="delete" color="red"
                 @click="delete_product(props.row)"
+                title="Delete"
                 />
             </q-td>
           </q-tr>
@@ -208,6 +214,10 @@ export default {
       }
     }
 
+    const view_product = (record) => {
+      router.push({name: 'main.products.detail', params: {id: record.id}})
+    }
+
     return {
       records,
       columns,
@@ -216,6 +226,7 @@ export default {
       processes,
       list_records,
       delete_product,
+      view_product,
       handle_updated: (record) => {
         const index = records.value.findIndex(v => v.id === record.id)
         if (index >= 0) Object.assign(records.value[index], record)

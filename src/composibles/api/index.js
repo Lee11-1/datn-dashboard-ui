@@ -202,6 +202,46 @@ class Api {
     )
   }
 
+  get_product_by_id (productId) {
+    return this.do_request(
+      `/api/products/get-by-id`,
+      {
+        method: 'get',
+        payload: { id: productId }
+      }
+    )
+  }
+
+  get_product_detail (productId) {
+    return this.do_request(
+      `/api/products/detail`,
+      {
+        method: 'get',
+        payload: { id: productId }
+      }
+    )
+  }
+
+  create_product_detail (payload) {
+    return this.do_request(
+      '/api/products/detail',
+      {
+        method: 'post',
+        payload,
+      }
+    )
+  }
+
+  update_product_detail (payload) {
+    return this.do_request(
+      '/api/products/detail',
+      {
+        method: 'put',
+        payload,
+      }
+    )
+  }
+
   list_categories (payload) {
     return this.do_request(
       '/api/categories',

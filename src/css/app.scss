@@ -67,3 +67,80 @@ html, body {
         padding-left: 32px;
     }
 }
+
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .image-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 8px;
+  }
+
+  .info-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+
+    .info-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: #666;
+      text-transform: capitalize;
+    }
+
+    .info-value {
+      font-size: 16px;
+      color: #333;
+      word-break: break-word;
+
+      &.text-primary {
+        color: var(--q-primary);
+      }
+
+      &.text-weight-bold {
+        font-weight: 600;
+      }
+
+      &.status-value {
+        width: fit-content;
+
+        :deep(.q-chip) {
+          min-width: 80px;
+          display: flex;
+          justify-content: center;
+          padding: 8px 16px;
+        }
+
+        :deep(.q-chip__content) {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin: 0;
+
+    .col-6 {
+      margin: 0;
+      padding: 0;
+    }
+
+    .info-item {
+      padding: 8px 0;
+    }
+  }
+}

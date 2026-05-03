@@ -62,7 +62,7 @@
 import {ref, reactive, computed} from 'vue'
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
-
+import {useStore} from 'vuex'
 import debounce from 'lodash/debounce'
 import {use_api} from 'src/composibles/api'
 
@@ -84,7 +84,7 @@ export default {
     const api = use_api()
     const $q = useQuasar()
     const router = useRouter()
-
+    const store = useStore()
     const records = ref([])
 
     const columns = computed(() => {
@@ -197,6 +197,7 @@ export default {
       if (!window.confirm('Are you sure to delete this record?')) return
       let payload = {
         id: record.id,
+        userId: store.state.Auth.user.id
       }
       const response = await api.delete_inventory(payload)
       if (response.status === 200) {
