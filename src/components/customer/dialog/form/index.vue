@@ -147,15 +147,19 @@
       const load_selected_zone = async () => {
         if (props.isUpdate && props.modelValue && props.modelValue.zoneId) {
           try {
-            const payload = {
-              search_text: '',
-              page: '1',
-              limit: '25',
-              sorts: '-'
-            }
-            const response = await api.list_zones(payload)
-            if (response.status === 200 && response.data.success) {
-              allZones.value = response.data.data || []
+            if (props.modelValue.zone) {
+              allZones.value = [props.modelValue.zone]
+            } else {
+              const payload = {
+                search_text: '',
+                page: '1',
+                limit: '25',
+                sorts: '-'
+              }
+              const response = await api.list_zones(payload)
+              if (response.status === 200 && response.data.success) {
+                allZones.value = response.data.data || []
+              }
             }
           } catch (error) {
             console.error('Error loading zone:', error)

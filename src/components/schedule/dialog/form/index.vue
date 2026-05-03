@@ -129,6 +129,7 @@ export default {
         startDate: null,
         endDate: null,
         zoneId: null,
+        zone: null,
         userId: null,
         status: 'planned',
         priority: 'medium',
@@ -224,13 +225,18 @@ export default {
           limit: '50',
           sorts: '-'
         }
-        const [zonesRes, usersRes] = await Promise.all([
-          api.list_zones(zonesPayload),
-          api.list_users(usersPayload)
-        ])
-        if (zonesRes.status === 200 && zonesRes.data.success) {
-          allZones.value = zonesRes.data.data || []
+        
+        if (props.modelValue.zone) {
+              allZones.value = [props.modelValue.zone]
         }
+        else{
+          zonesRes = await api.list_zones(zonesPayload)
+          if (zonesRes.status === 200 && zonesRes.data.success) {
+            allZones.value = zonesRes.data.data || []
+        }
+        }
+        const  usersRes = await api.list_users(usersPayload)
+       
         if (usersRes.status === 200 && usersRes.data.success) {
           allUsers.value = usersRes.data.data || []
         }
@@ -257,6 +263,20 @@ export default {
       const day = String(d.getDate()).padStart(2, '0')
       return `${year}-${month}-${day}`
     }
+
+    watch(
+      () => form_data.values.zoneId,
+      (zoneId) => {
+        if (zoneId) {
+          const selectedZone = allZones.value.find(z => z.id === zoneId)
+          if (selectedZone) {
+            form_data.values.zone = {id: selectedZone.id, name: selectedZone.name}
+          }
+        } else {
+          form_data.values.zone = null
+        }
+      }
+    )
 
     watch(
       form_data.values,

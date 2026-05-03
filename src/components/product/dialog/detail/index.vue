@@ -18,6 +18,13 @@
                    rows="4" />
         </div>
         <div class="col-12">
+            <div class="tour-detail-title">Uses</div>
+            <q-input v-model="form_data.values.uses"
+                   dense type="textarea" outlined
+                   placeholder="What is this product used for"
+                   rows="4" />
+        </div>
+        <div class="col-12">
             <div class="tour-detail-title">Manufacturing Place</div>
             <q-input v-model="form_data.values.manufacturingPlace"
                    dense outlined
@@ -96,6 +103,7 @@
           usageInstructions: null,
           components: null,
           manufacturingPlace: null,
+          uses: null,
           manufacturerContact: {
             name: null,
             phone: null,

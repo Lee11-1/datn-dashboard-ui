@@ -47,10 +47,7 @@ export default {
     const selectedPolygonWKT = ref('')
 
     const coordinatesToWKT = (coordinates) => {
-      // Convert GeoJSON coordinates to WKT MULTIPOLYGON format
-      // GeoJSON: [[[lon, lat], [lon, lat], ...]]
-      // WKT: MULTIPOLYGON (((lon lat, lon lat, ...)))
-      
+
       if (!coordinates || !Array.isArray(coordinates)) {
         return ''
       }
